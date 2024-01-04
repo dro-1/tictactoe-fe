@@ -244,9 +244,9 @@ export const GameScreen = () => {
         }) => {
           const { code, winningCells, winningClass } = data;
           if (code == CELL_STATES.x) {
-            setXWins(xWins + 1);
+            setXWins((xWins) => xWins + 1);
           } else {
-            setOWins(oWins + 1);
+            setOWins((oWins) => oWins + 1);
           }
           if (code == gameInfo.code) {
             setGameState(GAME_STATES.won);
@@ -264,7 +264,7 @@ export const GameScreen = () => {
       );
       socket.on("game_tie", (data) => {
         setGameState(GAME_STATES.tied);
-        setTies(ties + 1);
+        setTies((ties) => ties + 1);
       });
       socket.on("game_restart", (data) => {
         localStorage.setItem(
@@ -277,9 +277,9 @@ export const GameScreen = () => {
         );
         const code = data.code;
         if (code == "x") {
-          setOWins(oWins + 1);
+          setOWins((oWins) => oWins + 1);
         } else if (code == "o") {
-          setXWins(xWins + 1);
+          setXWins((xWins) => xWins + 1);
         }
         resetGame();
         setIsModalOpen(false);
