@@ -26,7 +26,7 @@ export const GameSelectionScreen = () => {
   };
 
   useEffect(() => {
-    const iSocket = io("http://localhost:5000", {
+    const iSocket = io("https://tictactoe-be.fly.dev", {
       reconnectionDelayMax: 10000,
     });
 
@@ -69,7 +69,7 @@ export const GameSelectionScreen = () => {
     setIsFetchingGameCode(true);
 
     try {
-      const resp = await axios.get("http://localhost:5000/create_game");
+      const resp = await axios.get("https://tictactoe-be.fly.dev/create_game");
       setGameId(resp.data.gameId);
       setSelectionState(states.CREATE);
     } catch (e) {

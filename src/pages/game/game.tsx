@@ -134,6 +134,35 @@ export const GameScreen = () => {
 
   const handleCellClick = (e, cell) => {
     e.preventDefault();
+    switch (cell) {
+      case 1:
+        setCell1(gameInfo.code);
+        break;
+      case 2:
+        setCell2(gameInfo.code);
+        break;
+      case 3:
+        setCell3(gameInfo.code);
+        break;
+      case 4:
+        setCell4(gameInfo.code);
+        break;
+      case 5:
+        setCell5(gameInfo.code);
+        break;
+      case 6:
+        setCell6(gameInfo.code);
+        break;
+      case 7:
+        setCell7(gameInfo.code);
+        break;
+      case 8:
+        setCell8(gameInfo.code);
+        break;
+      case 9:
+        setCell9(gameInfo.code);
+        break;
+    }
     socket.emit("try_game_move", {
       room: gameId,
       move: cell,
@@ -277,6 +306,16 @@ export const GameScreen = () => {
         </div>
       </div>
       <main className={`overlay ${isModalOpen ? "active" : ""}`}>
+        <div className="tag">
+          <p
+            style={{
+              color: gameInfo.code == CELL_STATES.o ? "#f2b137" : "#31c3bd",
+            }}
+          >
+            PLAYER
+          </p>
+          <img src={gameInfo.code == CELL_STATES.o ? iconODef : iconXDef} />
+        </div>
         <div className="topbar">
           <div>
             <img src={xando} alt="X and O Icons" />
