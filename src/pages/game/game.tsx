@@ -66,23 +66,6 @@ export const GameScreen = () => {
     const backwardDiag = cell1 == code && cell5 == code && cell9 == code;
     const forwardDiag = cell3 == code && cell5 == code && cell7 == code;
 
-    if (
-      cell1 != CELL_STATES.empty &&
-      cell2 != CELL_STATES.empty &&
-      cell3 != CELL_STATES.empty &&
-      cell4 != CELL_STATES.empty &&
-      cell5 != CELL_STATES.empty &&
-      cell6 != CELL_STATES.empty &&
-      cell7 != CELL_STATES.empty &&
-      cell8 != CELL_STATES.empty &&
-      cell9 != CELL_STATES.empty &&
-      gameInfo.code == "x"
-    ) {
-      socket.emit("try_game_tie", {
-        room: gameId,
-      });
-    }
-
     let winningCells = "";
     let winningClass = "";
     if (firstCol) {
@@ -124,6 +107,21 @@ export const GameScreen = () => {
         winningCells,
         winningClass,
         code,
+      });
+    } else if (
+      cell1 != CELL_STATES.empty &&
+      cell2 != CELL_STATES.empty &&
+      cell3 != CELL_STATES.empty &&
+      cell4 != CELL_STATES.empty &&
+      cell5 != CELL_STATES.empty &&
+      cell6 != CELL_STATES.empty &&
+      cell7 != CELL_STATES.empty &&
+      cell8 != CELL_STATES.empty &&
+      cell9 != CELL_STATES.empty &&
+      gameInfo.code == "x"
+    ) {
+      socket.emit("try_game_tie", {
+        room: gameId,
       });
     }
   }, [cell1, cell2, cell3, cell4, cell5, cell6, cell7, cell8, cell9]);
