@@ -134,35 +134,35 @@ export const GameScreen = () => {
 
   const handleCellClick = (e, cell) => {
     e.preventDefault();
-    switch (cell) {
-      case 1:
-        setCell1(gameInfo.code);
-        break;
-      case 2:
-        setCell2(gameInfo.code);
-        break;
-      case 3:
-        setCell3(gameInfo.code);
-        break;
-      case 4:
-        setCell4(gameInfo.code);
-        break;
-      case 5:
-        setCell5(gameInfo.code);
-        break;
-      case 6:
-        setCell6(gameInfo.code);
-        break;
-      case 7:
-        setCell7(gameInfo.code);
-        break;
-      case 8:
-        setCell8(gameInfo.code);
-        break;
-      case 9:
-        setCell9(gameInfo.code);
-        break;
-    }
+    // switch (cell) {
+    //   case 1:
+    //     setCell1(gameInfo.code);
+    //     break;
+    //   case 2:
+    //     setCell2(gameInfo.code);
+    //     break;
+    //   case 3:
+    //     setCell3(gameInfo.code);
+    //     break;
+    //   case 4:
+    //     setCell4(gameInfo.code);
+    //     break;
+    //   case 5:
+    //     setCell5(gameInfo.code);
+    //     break;
+    //   case 6:
+    //     setCell6(gameInfo.code);
+    //     break;
+    //   case 7:
+    //     setCell7(gameInfo.code);
+    //     break;
+    //   case 8:
+    //     setCell8(gameInfo.code);
+    //     break;
+    //   case 9:
+    //     setCell9(gameInfo.code);
+    //     break;
+    // }
     socket.emit("try_game_move", {
       room: gameId,
       move: cell,
@@ -193,105 +193,112 @@ export const GameScreen = () => {
     setWinningClasses("");
   };
 
-  if (socket) {
-    socket.on("game_move", (data) => {
-      console.log(data);
-      localStorage.setItem(
-        gameId,
-        JSON.stringify({
-          ...gameInfo,
-          nextTurn: data.nextTurn,
-        })
+  useEffect(() => {
+    if (socket) {
+      socket.on("game_move", (data) => {
+        console.log(data);
+        console.log(gameInfo);
+        localStorage.setItem(
+          gameId,
+          JSON.stringify({
+            ...gameInfo,
+            nextTurn: data.nextTurn,
+          })
+        );
+        switch (data.move) {
+          case 1:
+            setCell1(data.code);
+            break;
+          case 2:
+            setCell2(data.code);
+            break;
+          case 3:
+            setCell3(data.code);
+            break;
+          case 4:
+            setCell4(data.code);
+            break;
+          case 5:
+            setCell5(data.code);
+            break;
+          case 6:
+            setCell6(data.code);
+            break;
+          case 7:
+            setCell7(data.code);
+            break;
+          case 8:
+            setCell8(data.code);
+            break;
+          case 9:
+            setCell9(data.code);
+            break;
+        }
+      });
+      socket.on(
+        "game_win",
+        (data: {
+          code: string;
+          winningCells: string;
+          winningClass: string;
+        }) => {
+          const { code, winningCells, winningClass } = data;
+          if (code == CELL_STATES.x) {
+            setXWins(xWins + 1);
+          } else {
+            setOWins(oWins + 1);
+          }
+          if (code == gameInfo.code) {
+            setGameState(GAME_STATES.won);
+          } else {
+            setGameState(GAME_STATES.lost);
+          }
+
+          let cells = winningCells.split("");
+          setWinningCellsArr(cells);
+          setWinningClasses(winningClass);
+          setTimeout(() => {
+            setWinningClasses(winningClass + " active");
+          }, 500);
+        }
       );
-      switch (data.move) {
-        case 1:
-          setCell1(data.code);
-          break;
-        case 2:
-          setCell2(data.code);
-          break;
-        case 3:
-          setCell3(data.code);
-          break;
-        case 4:
-          setCell4(data.code);
-          break;
-        case 5:
-          setCell5(data.code);
-          break;
-        case 6:
-          setCell6(data.code);
-          break;
-        case 7:
-          setCell7(data.code);
-          break;
-        case 8:
-          setCell8(data.code);
-          break;
-        case 9:
-          setCell9(data.code);
-          break;
-      }
-    });
-    socket.on(
-      "game_win",
-      (data: { code: string; winningCells: string; winningClass: string }) => {
-        const { code, winningCells, winningClass } = data;
-        if (code == CELL_STATES.x) {
-          setXWins(xWins + 1);
-        } else {
+      socket.on("game_tie", (data) => {
+        setGameState(GAME_STATES.tied);
+        setTies(ties + 1);
+      });
+      socket.on("game_restart", (data) => {
+        localStorage.setItem(
+          gameId,
+          JSON.stringify({
+            ...gameInfo,
+            nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
+            roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
+          })
+        );
+        const code = data.code;
+        if (code == "x") {
           setOWins(oWins + 1);
+        } else if (code == "o") {
+          setXWins(xWins + 1);
         }
-        if (code == gameInfo.code) {
-          setGameState(GAME_STATES.won);
-        } else {
-          setGameState(GAME_STATES.lost);
-        }
+        resetGame();
+        setIsModalOpen(false);
+      });
 
-        let cells = winningCells.split("");
-        setWinningCellsArr(cells);
-        setWinningClasses(winningClass);
-        setTimeout(() => {
-          setWinningClasses(winningClass + " active");
-        }, 500);
-      }
-    );
-    socket.on("game_tie", (data) => {
-      setGameState(GAME_STATES.tied);
-      setTies(ties + 1);
-    });
-    socket.on("game_restart", (data) => {
-      localStorage.setItem(
-        gameId,
-        JSON.stringify({
-          ...gameInfo,
-          nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
-          roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
-        })
-      );
-      const code = data.code;
-      if (code == "x") {
-        setOWins(oWins + 1);
-      } else if (code == "o") {
-        setXWins(xWins + 1);
-      }
-      resetGame();
-      setIsModalOpen(false);
-    });
+      socket.on("game_continue", (data) => {
+        localStorage.setItem(
+          gameId,
+          JSON.stringify({
+            ...gameInfo,
+            nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
+            roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
+          })
+        );
 
-    socket.on("game_continue", (data) => {
-      localStorage.setItem(
-        gameId,
-        JSON.stringify({
-          ...gameInfo,
-          nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
-          roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
-        })
-      );
-
-      resetGame();
-    });
-  }
+        resetGame();
+      });
+    }
+  }, []);
 
   return (
     <div className="wrapper">

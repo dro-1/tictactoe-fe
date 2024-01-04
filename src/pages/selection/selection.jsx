@@ -13,6 +13,12 @@ const states = {
   NONE: "NONE",
 };
 
+const url =
+  // eslint-disable-next-line no-undef
+  process.env.NODE_ENV == "production"
+    ? "https://tictactoe-be.fly.dev"
+    : "http://localhost:5000";
+
 export const GameSelectionScreen = () => {
   const [selectionState, setSelectionState] = useState(states.NONE);
   const [isFetchingGameCode, setIsFetchingGameCode] = useState(false);
@@ -26,7 +32,7 @@ export const GameSelectionScreen = () => {
   };
 
   useEffect(() => {
-    const iSocket = io("https://tictactoe-be.fly.dev", {
+    const iSocket = io(url, {
       reconnectionDelayMax: 10000,
     });
 
@@ -69,7 +75,7 @@ export const GameSelectionScreen = () => {
     setIsFetchingGameCode(true);
 
     try {
-      const resp = await axios.get("https://tictactoe-be.fly.dev/create_game");
+      const resp = await axios.get(`${url}/create_game`);
       setGameId(resp.data.gameId);
       setSelectionState(states.CREATE);
     } catch (e) {
