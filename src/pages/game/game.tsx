@@ -15,6 +15,7 @@ import {
 } from "react";
 import { StoreContext } from "src/context/store.context";
 import { Loader } from "src/components/loader";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const CELL_STATES = {
   empty: "",
@@ -47,8 +48,10 @@ export const GameScreen = () => {
   const [gameState, setGameState] = useState(GAME_STATES.playing);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { gameId, socket } = useContext(StoreContext);
+  const navigate = useNavigate();
 
-  if (!gameId) return <Loader />;
+  console.log(gameId);
+  if (!gameId) return <Navigate to="/" />;
 
   let gameInfo = JSON.parse(localStorage.getItem(gameId));
 
