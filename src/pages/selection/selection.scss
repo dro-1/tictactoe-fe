@@ -1,0 +1,57 @@
+main {
+  form {
+    & > img {
+      margin-left: auto;
+      margin-right: auto;
+      width: 80%;
+      display: block;
+    }
+    button {
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 1rem;
+      width: 80%;
+      margin: 2rem auto;
+      color: #1a2a33;
+      border: none;
+      background-color: #a8bfc9;
+      font-size: 2rem;
+    }
+  }
+
+  div {
+    text-align: center;
+    h2 {
+      text-align: center;
+      font-size: 2rem;
+      color: #a8bfc9;
+      span {
+        display: block;
+        &:last-child {
+          margin-top: 2rem;
+          font-size: 3rem;
+          color: #f2b137;
+        }
+      }
+    }
+
+    input {
+      display: block;
+      padding: 1rem 2rem;
+      font-size: 2rem;
+      border-radius: 1rem;
+      border: none;
+    }
+    button {
+      font-size: 2rem;
+      margin-top: 1rem;
+      width: 100px;
+      padding: 1rem;
+      background-color: #f2b137;
+      border-radius: 1rem;
+      border: none;
+    }
+  }
+}
