@@ -14,8 +14,7 @@ import {
   useState,
 } from "react";
 import { StoreContext } from "src/context/store.context";
-import { Loader } from "src/components/loader";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 const CELL_STATES = {
   empty: "",
@@ -31,6 +30,10 @@ const GAME_STATES = {
 };
 
 export const GameScreen = () => {
+  const { gameId, socket } = useContext(StoreContext);
+
+  console.log(gameId);
+  if (!gameId) return <Navigate to="/" />;
   const [cell1, setCell1] = useState(CELL_STATES.empty);
   const [cell2, setCell2] = useState(CELL_STATES.empty);
   const [cell3, setCell3] = useState(CELL_STATES.empty);
@@ -44,16 +47,12 @@ export const GameScreen = () => {
   const [oWins, setOWins] = useState(0);
   const [winningCellsArr, setWinningCellsArr] = useState([]);
   const [winningClasses, setWinningClasses] = useState("");
+  const [gameInfo, setGameInfo] = useState(
+    JSON.parse(localStorage.getItem(gameId))
+  );
   const [ties, setTies] = useState(0);
   const [gameState, setGameState] = useState(GAME_STATES.playing);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { gameId, socket } = useContext(StoreContext);
-  const navigate = useNavigate();
-
-  console.log(gameId);
-  if (!gameId) return <Navigate to="/" />;
-
-  let gameInfo = JSON.parse(localStorage.getItem(gameId));
 
   useEffect(() => {
     const code = gameInfo.code;
@@ -195,17 +194,14 @@ export const GameScreen = () => {
   };
 
   useEffect(() => {
+    let gameInfo = JSON.parse(localStorage.getItem(gameId));
     if (socket) {
       socket.on("game_move", (data) => {
-        console.log(data);
-        console.log(gameInfo);
-        localStorage.setItem(
-          gameId,
-          JSON.stringify({
-            ...gameInfo,
-            nextTurn: data.nextTurn,
-          })
-        );
+        setGameInfo((gameInfo) => ({
+          ...gameInfo,
+          nextTurn: data.nextTurn,
+        }));
+
         switch (data.move) {
           case 1:
             setCell1(data.code);
@@ -264,18 +260,21 @@ export const GameScreen = () => {
         }
       );
       socket.on("game_tie", (data) => {
+        setGameInfo((gameInfo) => ({
+          ...gameInfo,
+          nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
+          roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
+        }));
+
         setGameState(GAME_STATES.tied);
         setTies((ties) => ties + 1);
       });
       socket.on("game_restart", (data) => {
-        localStorage.setItem(
-          gameId,
-          JSON.stringify({
-            ...gameInfo,
-            nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
-            roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
-          })
-        );
+        setGameInfo((gameInfo) => ({
+          ...gameInfo,
+          nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
+          roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
+        }));
         const code = data.code;
         if (code == "x") {
           setOWins((oWins) => oWins + 1);
@@ -287,14 +286,11 @@ export const GameScreen = () => {
       });
 
       socket.on("game_continue", (data) => {
-        localStorage.setItem(
-          gameId,
-          JSON.stringify({
-            ...gameInfo,
-            nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
-            roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
-          })
-        );
+        setGameInfo((gameInfo) => ({
+          ...gameInfo,
+          nextTurn: gameInfo.roundStarter == "x" ? "o" : "x",
+          roundStarter: gameInfo.roundStarter == "x" ? "o" : "x",
+        }));
 
         resetGame();
       });
@@ -358,7 +354,9 @@ export const GameScreen = () => {
         )}
 
         <div className={`board`}>
-          <div className={`winnerbar ${winningClasses && winningClasses}`} />
+          <div
+            className={`winnerbar ${winningClasses ? winningClasses : ""}`}
+          />
           <ButtonSlot
             cellState={cell1}
             onClick={(e) => handleCellClick(e, 1)}
@@ -463,15 +461,15 @@ const ButtonSlot: React.FC<
   return (
     <button
       disabled={!isCellActive}
-      className={`slot ${!isCellActive && "inactive"}`}
+      className={`slot ${!isCellActive ? "inactive" : ""}`}
       onClick={isCellActive ? onClick : () => {}}
       {...props}
     >
       {cellState == CELL_STATES.x && (
-        <img src={x} className={enlarge && "enlarge"} />
+        <img src={x} className={enlarge ? "enlarge" : ""} />
       )}
       {cellState == CELL_STATES.o && (
-        <img src={o} className={enlarge && "enlarge"} />
+        <img src={o} className={enlarge ? "enlarge" : ""} />
       )}
     </button>
   );
